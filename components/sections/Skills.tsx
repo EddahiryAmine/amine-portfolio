@@ -1,167 +1,196 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Simuler BlockReveal
-function BlockReveal({ children, onScroll, delay = 0 }: any) {
-  const [isVisible, setIsVisible] = useState(false);
-  
+gsap.registerPlugin(ScrollTrigger);
+
+// ============ REVEAL COMPONENT ============
+function Reveal({
+  children,
+  className = "",
+  y = 50,
+  delay = 0,
+  duration = 0.8,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  y?: number;
+  delay?: number;
+  duration?: number;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), delay * 1000);
-    return () => clearTimeout(timer);
-  }, [delay]);
-  
+    const el = ref.current;
+    if (!el) return;
+
+    gsap.set(el, { opacity: 0, y, filter: "blur(8px)" });
+
+    const ctx = gsap.context(() => {
+      gsap.to(el, {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration,
+        delay,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 85%",
+          toggleActions: "play none none reverse",
+        },
+      });
+    });
+
+    return () => ctx.revert();
+  }, [y, delay, duration]);
+
   return (
-    <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+    <div ref={ref} className={className}>
       {children}
     </div>
   );
 }
 
+// ============ SKILL CATEGORIES ============
 const SKILLS = {
-  frontend: ["React", "React Native", "Flutter", "VueJs", "Bootstrap"],
-  backend: ["Spring Boot", "Jakarta EE", ".Net", "Django", "Laravel", "Symfony"],
-  languages: [
-    "Java",
-    "C#",
-    "C++",
-    "C",
-    "Python",
-    "PHP",
-    "JavaScript",
-    "TypeScript",
-    "CSS",
-    "HTML",
+  featured: [
+    { name: "Spring Boot", icon: "🍃", level: 90, category: "Backend" },
+    { name: ".NET Core", icon: "⚡", level: 85, category: "Backend" },
+    { name: "FastAPI", icon: "🚀", level: 80, category: "Backend" },
+    { name: "React/Next.js", icon: "⚛️", level: 85, category: "Frontend" },
+    { name: "Docker", icon: "🐳", level: 85, category: "DevOps" },
+    { name: "PostgreSQL", icon: "🐘", level: 90, category: "Database" },
   ],
-  databases: [
-    "Oracle (DBA 1, DBA 2)",
-    "MongoDB (NoSQL)",
-    "PostgreSQL",
-    "MySQL",
-    "SQL Server",
-    "SQL Tuning",
-  ],
-  methods: ["Méthodes Agiles (Scrum)", "Jira", "UML", "Merise", "Figma"],
-  devops: ["Git", "GitHub", "GitLab CI/CD", "Docker", "SonarQube", "Postman"],
-  security: ["OpenID", "Keycloak"],
-  os: ["Linux", "Windows", "macOS"],
+  backend: ["Spring Boot", "Jakarta EE", ".NET", "FastAPI", "Django", "Laravel"],
+  frontend: ["React", "Next.js", "React Native", "Flutter", "Vue.js"],
+  languages: ["Java", "C#", "Python", "TypeScript", "JavaScript", "PHP"],
+  databases: ["PostgreSQL", "MySQL", "MongoDB", "Oracle", "SQL Server"],
+  devops: ["Docker", "Git", "CI/CD", "GitLab", "SonarQube"],
+  tools: ["Jira", "Figma", "Postman", "Keycloak", "UML"],
 };
 
-function Chip({ children }: { children: string }) {
-  return (
-    <span className="group inline-flex items-center rounded-lg border border-white/10 bg-black/40 backdrop-blur-xl px-3 py-1.5 text-xs text-white/75 transition-all hover:border-emerald-400/30 hover:bg-emerald-400/5 hover:text-emerald-100 hover:scale-105">
-      <span className="w-1 h-1 rounded-full bg-emerald-400/50 mr-2 group-hover:bg-emerald-400 group-hover:animate-pulse" />
-      {children}
-    </span>
-  );
-}
-
-function Node({
-  title,
-  items,
-  badge,
+// ============ FEATURED SKILL CARD ============
+function FeaturedSkill({
+  name,
   icon,
-  level = "child"
+  level,
+  category,
+  index,
 }: {
-  title: string;
-  items: string[];
-  badge?: string;
-  icon?: string;
-  level?: "root" | "child";
+  name: string;
+  icon: string;
+  level: number;
+  category: string;
+  index: number;
 }) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const colors = {
+    Backend: "emerald",
+    Frontend: "blue",
+    DevOps: "purple",
+    Database: "amber",
+  };
+
+  const color = colors[category as keyof typeof colors] || "emerald";
 
   return (
-    <div className={`group relative rounded-2xl border backdrop-blur overflow-hidden transition-all hover:scale-[1.01] ${
-      level === "root" 
-        ? "border-emerald-400/30 bg-gradient-to-br from-emerald-400/10 via-black/40 to-black/40" 
-        : "border-white/10 bg-black/30 hover:border-emerald-400/20"
-    }`}>
-      {/* Glow effect on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 via-transparent to-purple-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-      
-      <div className="relative">
-        {/* Header */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between gap-3 p-5 text-left"
-        >
-          <div className="flex items-center gap-3">
-            {/* Icon */}
-            {icon && (
-              <div className={`flex items-center justify-center w-10 h-10 rounded-lg border transition-all ${
-                level === "root"
-                  ? "border-emerald-400/30 bg-emerald-400/10 text-2xl"
-                  : "border-white/10 bg-white/5 text-xl"
-              }`}>
-                {icon}
-              </div>
-            )}
-            
-            {/* Title */}
-            <div>
-              <h3 className={`font-semibold ${level === "root" ? "text-base text-white" : "text-sm text-white/90"}`}>
-                {title}
-              </h3>
-              {badge && (
-                <span className="text-[10px] text-emerald-400/70 font-mono mt-0.5 block">
-                  // {badge}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Expand/Collapse indicator */}
-          <div className="flex items-center gap-2">
-            {items.length > 0 && (
-              <span className="text-xs text-white/40 font-mono">
-                {items.length}
-              </span>
-            )}
-            <svg
-              className={`w-5 h-5 text-emerald-400/70 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </button>
-
-        {/* Content */}
-        <div className={`overflow-hidden transition-all ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="px-5 pb-5">
-            {/* Separator line */}
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent mb-4" />
-            
-            {/* Skills chips */}
-            <div className="flex flex-wrap gap-2">
-              {items.map((x) => (
-                <Chip key={x}>{x}</Chip>
-              ))}
-            </div>
+    <div className="group relative">
+      <div
+        className={`absolute inset-0 bg-${color}-400/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500`}
+      />
+      <div className="relative rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-6 hover:border-${color}-400/30 transition-all hover:scale-105">
+        <div className="flex items-start justify-between mb-4">
+          <div className="text-4xl">{icon}</div>
+          <div className="text-xs px-2 py-1 rounded-full bg-white/5 text-white/60 font-mono">
+            {category}
           </div>
         </div>
 
-        {/* Progress bar at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/5">
-          <div 
-            className="h-full bg-gradient-to-r from-emerald-400 to-purple-400 transition-all group-hover:from-emerald-300 group-hover:to-purple-300"
-            style={{ width: `${Math.min(100, (items.length / 10) * 100)}%` }}
-          />
+        <h3 className="text-lg font-semibold text-white mb-3">{name}</h3>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-white/50 font-mono">Niveau</span>
+            <span className={`text-${color}-400 font-mono font-semibold`}>
+              {level}%
+            </span>
+          </div>
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className={`h-full bg-gradient-to-r from-${color}-400 to-${color}-300 rounded-full transition-all duration-1000`}
+              style={{
+                width: `${level}%`,
+                animationDelay: `${index * 0.1}s`,
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 flex gap-1">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className={`h-1 flex-1 rounded-full ${
+                i < Math.floor(level / 20)
+                  ? `bg-${color}-400`
+                  : "bg-white/10"
+              }`}
+            />
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-export default function Skills() {
-  const [mounted, setMounted] = useState(false);
+// ============ CATEGORY SECTION ============
+function CategorySection({
+  title,
+  icon,
+  skills,
+  color = "emerald",
+}: {
+  title: string;
+  icon: string;
+  skills: string[];
+  color?: string;
+}) {
+  return (
+    <div className="group">
+      <div className="flex items-center gap-3 mb-4">
+        <div
+          className={`w-10 h-10 rounded-lg bg-${color}-400/10 border border-${color}-400/30 flex items-center justify-center text-xl`}
+        >
+          {icon}
+        </div>
+        <div>
+          <h3 className="text-white font-semibold">{title}</h3>
+          <div className="text-xs text-white/40 font-mono">
+            {skills.length} technologies
+          </div>
+        </div>
+      </div>
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+      <div className="flex flex-wrap gap-2">
+        {skills.map((skill) => (
+          <span
+            key={skill}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-black/30 backdrop-blur text-xs text-white/70 hover:border-${color}-400/30 hover:bg-${color}-400/5 hover:text-white transition-all font-mono`}
+          >
+            <span className={`w-1 h-1 rounded-full bg-${color}-400`} />
+            {skill}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============ MAIN COMPONENT ============
+export default function Skills() {
+  const [activeTab, setActiveTab] = useState<"featured" | "all">("featured");
 
   return (
     <section
@@ -172,227 +201,220 @@ export default function Skills() {
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f14] via-[#070a0f] to-black" />
         <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay bg-[url('/noise.png')]" />
-        
-        {/* Animated grid */}
-        <div 
+
+        <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `linear-gradient(rgba(16,185,129,0.3) 1px, transparent 1px), 
                             linear-gradient(90deg, rgba(16,185,129,0.3) 1px, transparent 1px)`,
-            backgroundSize: '40px 40px',
-            animation: 'gridMove 20s linear infinite'
+            backgroundSize: "40px 40px",
+            animation: "gridMove 20s linear infinite",
           }}
         />
-        
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
 
-        <div className="absolute left-1/2 top-10 -translate-x-1/2 h-[520px] w-[900px] rounded-full blur-3xl opacity-20
-                        bg-[radial-gradient(circle_at_50%_40%,rgba(16,185,129,0.18),transparent_60%)] animate-pulse-slow" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
+        <div className="absolute left-1/2 top-20 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-400/10 rounded-full blur-3xl opacity-20" />
       </div>
 
       <div className="relative mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-12">
-          <BlockReveal onScroll>
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/5 backdrop-blur-xl px-4 py-2">
+        <div className="mb-16 text-center">
+          <Reveal>
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/5 backdrop-blur-xl px-4 py-2 mb-6">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-mono text-emerald-400">skills.tree.active</span>
+              <span className="text-xs font-mono text-emerald-400">
+                skills.init()
+              </span>
             </div>
-          </BlockReveal>
+          </Reveal>
 
-          <BlockReveal onScroll delay={0.06}>
-            <h2 className="mt-6 text-4xl md:text-5xl font-bold tracking-tight text-white">
-              Stack <span className="text-emerald-400">Technique</span>
+          <Reveal delay={0.1}>
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tight text-white mb-4">
+              <span className="text-purple-400 font-mono text-2xl">class</span>{" "}
+              Stack {"{"}<br />
+              <span className="text-emerald-400">Technique</span>
+              <br />
+              {"}"}
             </h2>
-          </BlockReveal>
+          </Reveal>
 
-          <BlockReveal onScroll delay={0.12}>
-            <p className="mt-4 max-w-2xl text-white/60 leading-relaxed">
-              Technologies et outils que j'utilise pour construire des applications robustes, 
-              scalables et maintenables.
+          <Reveal delay={0.15}>
+            <p className="max-w-2xl mx-auto text-white/60 leading-relaxed">
+              Technologies maîtrisées pour construire des applications{" "}
+              <span className="text-emerald-400">robustes</span> et{" "}
+              <span className="text-emerald-400">scalables</span>
             </p>
-          </BlockReveal>
+          </Reveal>
         </div>
 
-        {/* Main Tree Structure */}
-        <div className="mt-12">
-          <div className="relative rounded-3xl border border-white/10 bg-black/20 backdrop-blur-xl p-6 md:p-10 overflow-hidden">
-            {/* Decorative background */}
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-full bg-gradient-to-b from-emerald-400/30 via-emerald-400/10 to-transparent" />
-            </div>
-
-            {/* SVG Tree Lines - Enhanced */}
-            {mounted && (
-              <div className="pointer-events-none absolute inset-0 hidden lg:block">
-                <svg
-                  className="absolute inset-0 h-full w-full"
-                  viewBox="0 0 1200 900"
-                  preserveAspectRatio="none"
-                >
-                  {/* Root to main branches */}
-                  <path
-                    d="M600 95 L600 180"
-                    stroke="rgba(16,185,129,0.3)"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeDasharray="5,5"
-                    className="animate-dash"
-                  />
-                  
-                  {/* Main branches to left */}
-                  <path
-                    d="M600 180 L320 180 L320 230"
-                    stroke="rgba(16,185,129,0.25)"
-                    strokeWidth="2"
-                    fill="none"
-                  />
-                  
-                  {/* Main branches to right */}
-                  <path
-                    d="M600 180 L880 180 L880 230"
-                    stroke="rgba(16,185,129,0.25)"
-                    strokeWidth="2"
-                    fill="none"
-                  />
-
-                  {/* Connection dots */}
-                  <circle cx="600" cy="95" r="4" fill="rgba(16,185,129,0.5)" className="animate-pulse" />
-                  <circle cx="600" cy="180" r="4" fill="rgba(16,185,129,0.5)" />
-                  <circle cx="320" cy="180" r="3" fill="rgba(16,185,129,0.4)" />
-                  <circle cx="880" cy="180" r="3" fill="rgba(16,185,129,0.4)" />
-                </svg>
-              </div>
-            )}
-
-            {/* Root Node */}
-            <div className="flex justify-center">
-              <BlockReveal onScroll>
-                <div className="relative z-10">
-                  <div className="rounded-2xl border-2 border-emerald-400/40 bg-gradient-to-br from-emerald-400/20 via-black/60 to-black/60 backdrop-blur-xl px-8 py-4 text-center shadow-2xl shadow-emerald-500/20">
-                    <div className="text-3xl mb-2">🌳</div>
-                    <div className="text-xs uppercase tracking-widest text-emerald-300/90 font-mono">
-                      {"<"} Tech Stack {"/>"}
-                    </div>
-                    <div className="mt-2 text-sm text-white/70">
-                      Compétences Techniques
-                    </div>
-                  </div>
-                  
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-emerald-400/20 rounded-2xl blur-xl -z-10 animate-pulse-slow" />
-                </div>
-              </BlockReveal>
-            </div>
-
-            {/* Main Branches - Frontend & Backend */}
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <BlockReveal onScroll delay={0.08}>
-                <Node
-                  title="Frontend Development"
-                  badge="client-side"
-                  items={SKILLS.frontend}
-                  icon="🎨"
-                  level="root"
-                />
-              </BlockReveal>
-
-              <BlockReveal onScroll delay={0.14}>
-                <Node
-                  title="Backend Development"
-                  badge="server-side"
-                  items={SKILLS.backend}
-                  icon="⚙️"
-                  level="root"
-                />
-              </BlockReveal>
-            </div>
-
-            {/* Secondary Branches */}
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <BlockReveal onScroll delay={0.10}>
-                <Node 
-                  title="Langages de Programmation" 
-                  items={SKILLS.languages} 
-                  icon="💻"
-                />
-              </BlockReveal>
-
-              <BlockReveal onScroll delay={0.16}>
-                <Node 
-                  title="Bases de Données (SGBD)" 
-                  items={SKILLS.databases} 
-                  icon="🗄️"
-                />
-              </BlockReveal>
-
-              <BlockReveal onScroll delay={0.22}>
-                <Node 
-                  title="DevOps & Outils" 
-                  items={SKILLS.devops} 
-                  icon="🚀"
-                />
-              </BlockReveal>
-
-              <BlockReveal onScroll delay={0.28}>
-                <Node 
-                  title="Méthodologies & Modélisation" 
-                  items={SKILLS.methods} 
-                  icon="📋"
-                />
-              </BlockReveal>
-
-              <BlockReveal onScroll delay={0.34}>
-                <Node 
-                  title="Sécurité & Authentification" 
-                  items={SKILLS.security} 
-                  icon="🔐"
-                />
-              </BlockReveal>
-
-              <BlockReveal onScroll delay={0.40}>
-                <Node 
-                  title="Systèmes d'Exploitation" 
-                  items={SKILLS.os} 
-                  icon="🖥️"
-                />
-              </BlockReveal>
-            </div>
-
-            {/* Stats Summary */}
-            <BlockReveal onScroll delay={0.46}>
-              <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-emerald-400">
-                    {SKILLS.frontend.length + SKILLS.backend.length}+
-                  </div>
-                  <div className="text-xs text-white/50 mt-1 font-mono">Frameworks</div>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-400">
-                    {SKILLS.languages.length}+
-                  </div>
-                  <div className="text-xs text-white/50 mt-1 font-mono">Langages</div>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-purple-400">
-                    {SKILLS.databases.length}+
-                  </div>
-                  <div className="text-xs text-white/50 mt-1 font-mono">Databases</div>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-amber-400">
-                    {SKILLS.devops.length}+
-                  </div>
-                  <div className="text-xs text-white/50 mt-1 font-mono">DevOps Tools</div>
-                </div>
-              </div>
-            </BlockReveal>
+        {/* Tab Navigation */}
+        <Reveal delay={0.2}>
+          <div className="flex justify-center gap-2 mb-12">
+            <button
+              onClick={() => setActiveTab("featured")}
+              className={`px-6 py-3 rounded-xl font-mono text-sm transition-all ${
+                activeTab === "featured"
+                  ? "bg-emerald-400/10 border-2 border-emerald-400/50 text-emerald-400"
+                  : "bg-black/30 border border-white/10 text-white/60 hover:border-white/20"
+              }`}
+            >
+              <span className="text-emerald-400 mr-2">//</span> Principales
+            </button>
+            <button
+              onClick={() => setActiveTab("all")}
+              className={`px-6 py-3 rounded-xl font-mono text-sm transition-all ${
+                activeTab === "all"
+                  ? "bg-emerald-400/10 border-2 border-emerald-400/50 text-emerald-400"
+                  : "bg-black/30 border border-white/10 text-white/60 hover:border-white/20"
+              }`}
+            >
+              <span className="text-emerald-400 mr-2">//</span> Toutes
+            </button>
           </div>
-        </div>
+        </Reveal>
+
+        {/* Featured Skills */}
+        {activeTab === "featured" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            {SKILLS.featured.map((skill, i) => (
+              <Reveal key={skill.name} delay={0.05 * i}>
+                <FeaturedSkill {...skill} index={i} />
+              </Reveal>
+            ))}
+          </div>
+        )}
+
+        {/* All Skills by Category */}
+        {activeTab === "all" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Reveal delay={0.05}>
+              <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6">
+                <CategorySection
+                  title="Backend"
+                  icon="⚙️"
+                  skills={SKILLS.backend}
+                  color="emerald"
+                />
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6">
+                <CategorySection
+                  title="Frontend"
+                  icon="🎨"
+                  skills={SKILLS.frontend}
+                  color="blue"
+                />
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6">
+                <CategorySection
+                  title="Langages"
+                  icon="💻"
+                  skills={SKILLS.languages}
+                  color="purple"
+                />
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.2}>
+              <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6">
+                <CategorySection
+                  title="Databases"
+                  icon="🗄️"
+                  skills={SKILLS.databases}
+                  color="amber"
+                />
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.25}>
+              <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6">
+                <CategorySection
+                  title="DevOps"
+                  icon="🚀"
+                  skills={SKILLS.devops}
+                  color="cyan"
+                />
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.3}>
+              <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl p-6">
+                <CategorySection
+                  title="Outils"
+                  icon="🛠️"
+                  skills={SKILLS.tools}
+                  color="pink"
+                />
+              </div>
+            </Reveal>
+          </div>
+        )}
+
+        {/* Stats Summary */}
+        <Reveal delay={0.35}>
+          <div className="mt-16 rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-emerald-400/10 to-black/20 backdrop-blur-xl p-8">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 text-sm text-emerald-400 font-mono mb-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                Performance Overview
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                Statistiques du Stack
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-emerald-400 mb-2">
+                  6+
+                </div>
+                <div className="text-sm text-white/50 font-mono">
+                  Backend
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-blue-400 mb-2">
+                  5+
+                </div>
+                <div className="text-sm text-white/50 font-mono">
+                  Frontend
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-purple-400 mb-2">
+                  6+
+                </div>
+                <div className="text-sm text-white/50 font-mono">
+                  Langages
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-amber-400 mb-2">
+                  5+
+                </div>
+                <div className="text-sm text-white/50 font-mono">
+                  Databases
+                </div>
+              </div>
+            </div>
+
+            {/* Code snippet decoration */}
+            <div className="mt-8 flex justify-center">
+              <div className="rounded-lg border border-emerald-400/30 bg-black/60 backdrop-blur px-4 py-2 font-mono text-xs text-emerald-400">
+                <span className="text-purple-400">return</span>{" "}
+                <span className="text-amber-400">"Production Ready"</span>;
+              </div>
+            </div>
+          </div>
+        </Reveal>
       </div>
 
-     
+    
     </section>
   );
 }

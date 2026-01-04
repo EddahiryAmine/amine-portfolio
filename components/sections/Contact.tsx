@@ -226,28 +226,24 @@ export default function Contact() {
 
             {/* Primary CTA */}
             <BlockReveal onScroll delay={0.18}>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col gap-3 w-full sm:w-auto">
                 <a
                   href={`mailto:${LINKS.email}`}
                   className="
                     group inline-flex items-center justify-center gap-2
-                    rounded-2xl px-8 py-4
+                    rounded-xl px-6 py-3 sm:px-8 sm:py-4
                     bg-gradient-to-r from-emerald-400 to-emerald-500 text-black font-bold text-sm
-                    shadow-2xl shadow-emerald-500/40
+                    shadow-lg sm:shadow-2xl shadow-emerald-500/30 sm:shadow-emerald-500/40
                     transition-all
-                    hover:shadow-emerald-500/60 hover:scale-105
-                    active:scale-95
+                    hover:shadow-emerald-500/50 active:scale-95
                     relative overflow-hidden
                   "
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                  <svg className="w-5 h-5 relative" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span className="hidden sm:block absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 relative" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span className="relative">Envoyer un email</span>
-                  <svg className="w-4 h-4 relative transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
                 </a>
 
                 <a
@@ -256,21 +252,17 @@ export default function Contact() {
                   rel="noreferrer"
                   className="
                     group inline-flex items-center justify-center gap-2
-                    rounded-2xl px-8 py-4
+                    rounded-xl px-6 py-3 sm:px-8 sm:py-4
                     border border-white/20 bg-white/[0.05]
                     text-white font-semibold text-sm backdrop-blur-xl
                     transition-all
-                    hover:bg-white/[0.1] hover:border-emerald-400/30 hover:scale-105
-                    active:scale-95
+                    hover:bg-white/[0.1] hover:border-emerald-400/30 active:scale-95
                   "
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                   <span>LinkedIn</span>
-                  <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
                 </a>
               </div>
             </BlockReveal>
@@ -423,7 +415,7 @@ export default function Contact() {
         </BlockReveal>
       </div>
 
-    
+     
     </section>
   );
 }

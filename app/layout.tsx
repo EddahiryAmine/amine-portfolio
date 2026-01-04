@@ -1,19 +1,14 @@
 import "./globals.css";
-import Background from "@/components/layout/Background";
-
-export const metadata = {
-  title: "Portfolio | Ingénieur Logiciel",
-  description: "Portfolio professionnel",
-};
+import { Providers } from "./providers";
+import Footer from "@/components/Footer";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body>
-        <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden">
-          <Background />
-          <div className="relative">{children}</div>
-        </main>
+        <Providers>{children}
+            <Footer />
+        </Providers>
       </body>
     </html>
   );

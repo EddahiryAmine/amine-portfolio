@@ -1,489 +1,487 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Simuler BlockReveal
-function BlockReveal({ children, onScroll, delay = 0 }: any) {
-  const [isVisible, setIsVisible] = useState(false);
-  
+gsap.registerPlugin(ScrollTrigger);
+
+// ============ REVEAL COMPONENT ============
+function Reveal({
+  children,
+  className = "",
+  y = 50,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  y?: number;
+  delay?: number;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), delay * 1000);
-    return () => clearTimeout(timer);
-  }, [delay]);
-  
+    const el = ref.current;
+    if (!el) return;
+
+    gsap.set(el, { opacity: 0, y, filter: "blur(8px)" });
+
+    const ctx = gsap.context(() => {
+      gsap.to(el, {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 0.8,
+        delay,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 85%",
+          toggleActions: "play none none reverse",
+        },
+      });
+    });
+
+    return () => ctx.revert();
+  }, [y, delay]);
+
   return (
-    <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+    <div ref={ref} className={className}>
       {children}
     </div>
   );
 }
 
-/* ----------------------------- Types & Data ----------------------------- */
-
+// ============ DATA ============
 type ProjectType = "stage" | "academic";
 
 type Project = {
   type: ProjectType;
   title: string;
-  subtitle?: string;
+  subtitle: string;
   desc: string;
-  fullDesc?: string;
   stack: string[];
   image?: string;
-  links?: { label: string; href: string }[];
-  year?: string;
-  status?: string;
+  year: string;
+  status: string;
+  featured?: boolean;
 };
 
-const ALL_PROJECTS: Project[] = [
+const PROJECTS: Project[] = [
   {
     type: "stage",
-    title: "EQDOM Casablanca",
-    subtitle: "Stage Développeur Mobile (Juil 2025 → Sep 2025)",
-    desc: "App React Native avec intégration SDK Mon eID via bridge Kotlin, backend Spring Boot et PostgreSQL.",
-    fullDesc: "Développement d'une application mobile React Native avec intégration du SDK Mon eID via bridge Kotlin. L'app est connectée à un backend Spring Boot pour une authentification sécurisée et la gestion des données, avec persistance dans PostgreSQL.",
-    stack: ["React Native", "Spring Boot", "PostgreSQL", "SDK", "Sécurité"],
-    image: "/projects/eqdom.jpg",
-    links: [{ label: "Détails", href: "#resume" }],
+    title: "EQDOM",
+    subtitle: "App Mobile React Native • Backend Spring Boot",
+    desc: "Intégration SDK Mon eID via bridge Kotlin, authentification sécurisée et persistance PostgreSQL.",
+    stack: ["React Native", "Spring Boot", "PostgreSQL", "Kotlin", "Security"],
     year: "2025",
-    status: "Production"
+    status: "Production",
+    featured: true,
   },
   {
     type: "stage",
-    title: "BS-Link Casablanca",
-    subtitle: "Stage Développeur Backend (Juil 2024 → Sep 2024)",
-    desc: "Application web ASP.NET inspirée de Dynamics pour le suivi de processus d'achats en contexte ERP.",
-    fullDesc: "Conception d'une application web ASP.NET orientée logique métier pour le suivi des demandes d'achats en contexte ERP : workflows, écrans métier, règles de validation et exploitation de données côté SQL.",
-    stack: ["ASP.NET", "C#", "ERP", "Workflows", "SQL"],
-    image: "/projects/BS-Link.png",
+    title: "BS-Link",
+    subtitle: "Application Web ASP.NET • ERP",
+    desc: "Suivi des processus d'achats : workflows, règles métier et validation SQL.",
+    stack: ["ASP.NET", "C#", "SQL Server", "ERP"],
     year: "2024",
-    status: "Déployé"
+    status: "Déployé",
+    featured: true,
   },
   {
     type: "stage",
-    title: "Wal-IT Services Casablanca",
-    subtitle: "Stage Backend Full-Stack (Avr 2023 → Mai 2023)",
-    desc: "Plateforme Laravel pour la publication et la gestion de formations en ligne (back-office).",
-    fullDesc: "Développement d'une plateforme web sous Laravel permettant la publication, l'administration et la gestion de contenus de formations en ligne (back-office), avec authentification et opérations CRUD orientées usage réel.",
-    stack: ["Laravel", "PHP", "Auth", "CRUD", "Web"],
-    image: "/projects/wal-it-services.png",
+    title: "Wal-IT Services",
+    subtitle: "Plateforme Laravel • Formations",
+    desc: "Back-office de gestion de contenus pédagogiques avec authentification et CRUD.",
+    stack: ["Laravel", "PHP", "MySQL", "Auth"],
     year: "2023",
-    status: "Livré"
+    status: "Livré",
   },
   {
     type: "academic",
     title: "SmartFun 2030",
     subtitle: "Microservices • Event-Driven",
-    desc: "Billetterie & événements : API Gateway, auth JWT, RabbitMQ, DB par service, découplage et discovery.",
-    stack: ["Spring Boot", "Gateway", "RabbitMQ", "JWT", "MongoDB"],
+    desc: "Billetterie événementielle avec Gateway, RabbitMQ, JWT et MongoDB.",
+    stack: ["Spring Boot", "Gateway", "RabbitMQ", "JWT"],
     year: "2024",
-    status: "Complété"
+    status: "Complété",
+    featured: true,
   },
   {
     type: "academic",
     title: "Portail Pédagogique",
-    subtitle: "ASP.NET Core • SQL Server",
-    desc: "Gestion pédagogique : cours/TD/TP, documents, rôles et réservation de salles avec authentification.",
-    stack: ["ASP.NET Core", "SQL Server", "RBAC", "ERP-like"],
+    subtitle: "ASP.NET Core • Gestion",
+    desc: "Système de gestion cours/TD/TP avec réservation de salles et RBAC.",
+    stack: ["ASP.NET Core", "SQL Server", "RBAC"],
     year: "2024",
-    status: "Complété"
+    status: "Complété",
   },
   {
     type: "academic",
     title: "JobPortal",
-    subtitle: "Laravel • React • MySQL",
-    desc: "Recrutement : offres, candidatures, suivi des statuts et canal employeur–candidat après acceptation.",
-    stack: ["Laravel", "React", "MySQL", "Workflow"],
+    subtitle: "Laravel + React • Recrutement",
+    desc: "Plateforme offres/candidatures avec workflow employeur-candidat.",
+    stack: ["Laravel", "React", "MySQL"],
     year: "2024",
-    status: "Complété"
+    status: "Complété",
   },
   {
     type: "academic",
     title: "DAR VISION",
-    subtitle: "Microservices • n8n • IA x2",
-    desc: "Design d'intérieur IA : détection du type d'espace + génération de redesign (image-to-image), workflows n8n.",
-    stack: ["Spring Boot", "Microservices", "n8n", "ML API", "Img2Img"],
+    subtitle: "Microservices • IA Design",
+    desc: "Design d'intérieur IA : détection d'espace + génération image-to-image via n8n.",
+    stack: ["Spring Boot", "n8n", "ML API", "Img2Img"],
     year: "2024",
-    status: "Complété"
+    status: "Complété",
   },
   {
     type: "academic",
     title: "Sentiment App",
-    subtitle: "NLP • Tweets & Feedbacks",
-    desc: "Analyse de sentiment sur tweets et feedbacks clients via modèle IA, exposition API et usage orienté KPI.",
-    stack: ["NLP", "API", "Mobile", "KPI", "IA"],
+    subtitle: "NLP • Analyse de Sentiment",
+    desc: "Analyse tweets et feedbacks clients via modèle IA avec exposition API.",
+    stack: ["NLP", "API", "Mobile", "ML"],
     year: "2024",
-    status: "Complété"
+    status: "Complété",
   },
 ];
 
-function Pill({ active, children, onClick }: { active?: boolean; children: string; onClick?: () => void }) {
+// ============ COMPONENTS ============
+function FilterTab({
+  active,
+  children,
+  count,
+  onClick,
+}: {
+  active: boolean;
+  children: string;
+  count: number;
+  onClick: () => void;
+}) {
   return (
     <button
-      type="button"
       onClick={onClick}
-      className={`
-        relative inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all border backdrop-blur
-        active:scale-95
-        ${active
-          ? "border-emerald-400/40 bg-gradient-to-r from-emerald-400/15 to-emerald-400/10 text-emerald-100 shadow-lg shadow-emerald-500/20"
-          : "border-white/10 bg-white/[0.03] text-white/70 hover:border-emerald-400/20 hover:bg-emerald-400/[0.06] hover:text-white"
-        }
-      `}
+      className={`relative px-6 py-3 rounded-xl font-mono text-sm transition-all border ${
+        active
+          ? "border-emerald-400/50 bg-emerald-400/10 text-emerald-400 shadow-lg shadow-emerald-500/20"
+          : "border-white/10 bg-black/30 text-white/60 hover:border-emerald-400/30 hover:text-white"
+      }`}
     >
       {active && (
-        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-400/10 to-transparent animate-shimmer" />
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/10 to-transparent rounded-xl animate-pulse" />
       )}
-      <span className="relative">{children}</span>
+      <span className="relative flex items-center gap-2">
+        <span className={active ? "text-emerald-400" : "text-white/40"}>//</span>
+        {children}
+        <span className="text-xs opacity-70">({count})</span>
+      </span>
     </button>
   );
 }
 
-function Tag({ children }: { children: string }) {
+function ProjectCard({ project }: { project: Project }) {
   return (
-    <span className="inline-flex items-center rounded-lg border border-white/10 bg-black/40 backdrop-blur-xl px-2.5 py-1 text-xs text-white/70 font-mono hover:border-emerald-400/30 hover:bg-emerald-400/5 transition-all">
-      <span className="text-emerald-400 mr-1">#</span>
-      {children}
-    </span>
-  );
-}
+    <div className="group relative h-full flex flex-col rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl overflow-hidden hover:border-emerald-400/30 transition-all duration-300 hover:scale-[1.02]">
+      {/* Glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 via-transparent to-purple-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-function MediaFallback({ label, type }: { label: string; type: ProjectType }) {
-  return (
-    <div className="absolute inset-0">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 via-black/80 to-purple-400/10" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.2),transparent_55%)]" />
-      <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay bg-[url('/noise.png')]" />
-
-      {/* Code pattern background */}
-      <div className="absolute inset-0 opacity-[0.03]" 
-        style={{
-          backgroundImage: `linear-gradient(rgba(16,185,129,0.3) 1px, transparent 1px), 
-                          linear-gradient(90deg, rgba(16,185,129,0.3) 1px, transparent 1px)`,
-          backgroundSize: '30px 30px'
-        }}
-      />
-
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-flex rounded-2xl border-2 border-white/10 bg-black/60 backdrop-blur-xl p-6">
-            <div className="text-6xl mb-3">{type === "stage" ? "💼" : "🎓"}</div>
-            <div className="text-sm font-semibold text-white/90 mb-1">{label}</div>
-            <div className="text-xs text-white/50 font-mono">// Coming soon</div>
+      {/* Image/Placeholder */}
+      <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-emerald-400/10 to-purple-400/10">
+        {project.image ? (
+          <img
+            src={project.image}
+            alt={project.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-5xl mb-2">
+                {project.type === "stage" ? "💼" : "🎓"}
+              </div>
+              <div className="text-xs text-white/40 font-mono">
+                // {project.type}
+              </div>
+            </div>
           </div>
+        )}
+
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex gap-2">
+          <span
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold backdrop-blur-xl border ${
+              project.type === "stage"
+                ? "bg-blue-400/20 border-blue-400/40 text-blue-100"
+                : "bg-purple-400/20 border-purple-400/40 text-purple-100"
+            }`}
+          >
+            {project.type === "stage" ? "💼 Stage" : "🎓 Academic"}
+          </span>
+        </div>
+
+        {/* Status */}
+        <div className="absolute top-3 right-3">
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-400/20 border border-emerald-400/40 backdrop-blur-xl text-xs text-emerald-100 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            {project.status}
+          </span>
+        </div>
+
+        {/* Year */}
+        <div className="absolute bottom-3 right-3">
+          <span className="px-3 py-1 rounded-lg bg-black/80 border border-white/20 backdrop-blur-xl text-xs text-white/80 font-mono">
+            {project.year}
+          </span>
         </div>
       </div>
+
+      {/* Content */}
+      <div className="relative flex-1 p-5 flex flex-col">
+        <h3 className="text-xl font-bold text-white mb-1">{project.title}</h3>
+        <p className="text-xs text-emerald-400/80 font-medium mb-3">
+          {project.subtitle}
+        </p>
+
+        <p className="text-sm text-white/70 leading-relaxed mb-4 flex-1">
+          {project.desc}
+        </p>
+
+        {/* Stack */}
+        <div className="flex flex-wrap gap-2 mt-auto">
+          {project.stack.slice(0, 4).map((tech) => (
+            <span
+              key={tech}
+              className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-white/70 font-mono hover:border-emerald-400/30 hover:bg-emerald-400/5 transition-all"
+            >
+              <span className="text-emerald-400 mr-1">#</span>
+              {tech}
+            </span>
+          ))}
+          {project.stack.length > 4 && (
+            <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-white/50 font-mono">
+              +{project.stack.length - 4}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom line indicator */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
     </div>
   );
 }
 
-function ProjectMedia({ src, type }: { src?: string; type: ProjectType }) {
-  const [failed, setFailed] = useState(false);
-
-  if (!src) return <MediaFallback label="Preview à venir" type={type} />;
-  if (failed) return <MediaFallback label="Image introuvable" type={type} />;
-
-  return (
-    <img
-      src={src}
-      alt=""
-      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-      onError={() => setFailed(true)}
-    />
-  );
-}
-
-function ScrollButton({ dir, onClick }: { dir: "prev" | "next"; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="
-        group inline-flex items-center justify-center
-        rounded-xl border border-white/10 bg-black/40 backdrop-blur-xl
-        w-12 h-12 text-white/70 
-        transition-all
-        hover:border-emerald-400/30 hover:bg-emerald-400/10 hover:text-emerald-400 hover:scale-110
-        active:scale-95
-      "
-    >
-      <svg 
-        className={`w-5 h-5 transition-transform group-hover:${dir === 'prev' ? '-translate-x-0.5' : 'translate-x-0.5'}`}
-        fill="none" 
-        viewBox="0 0 24 24" 
-        stroke="currentColor"
-      >
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          strokeWidth={2.5} 
-          d={dir === "prev" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} 
-        />
-      </svg>
-    </button>
-  );
-}
-
-function ProjectCard({ p }: { p: Project }) {
-  const [open, setOpen] = useState(false);
-  const hasFull = Boolean(p.fullDesc && p.fullDesc.trim().length > 0);
-
-  return (
-    <article className="group h-full overflow-hidden rounded-3xl border border-white/10 bg-black/60 backdrop-blur-xl shadow-2xl transition-all hover:border-emerald-400/30 hover:-translate-y-1 hover:shadow-emerald-500/10">
-      {/* Media */}
-      <div className="relative h-[58%] w-full overflow-hidden">
-        <ProjectMedia src={p.image} type={p.type} />
-
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-        
-        {/* Top badges */}
-        <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2 z-10">
-          {p.subtitle && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/30 bg-black/70 backdrop-blur-xl px-3 py-1.5 text-xs font-medium text-emerald-100">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              {p.subtitle}
-            </span>
-          )}
-        </div>
-
-        {/* Bottom info bar */}
-        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
-          <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center rounded-lg border backdrop-blur-xl px-2.5 py-1 text-xs font-medium ${
-              p.type === "stage"
-                ? "border-blue-400/30 bg-blue-400/10 text-blue-100"
-                : "border-purple-400/30 bg-purple-400/10 text-purple-100"
-            }`}>
-              {p.type === "stage" ? "💼 Stage" : "🎓 Academic"}
-            </span>
-            
-            {p.year && (
-              <span className="inline-flex items-center rounded-lg border border-white/10 bg-black/60 backdrop-blur-xl px-2.5 py-1 text-xs text-white/70 font-mono">
-                {p.year}
-              </span>
-            )}
-          </div>
-
-          {p.status && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/30 bg-black/70 backdrop-blur-xl px-2.5 py-1 text-xs text-emerald-400 font-mono">
-              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-              {p.status}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="h-[42%] p-6 flex flex-col">
-        <h4 className="text-lg font-bold text-white leading-snug line-clamp-1 group-hover:text-emerald-400 transition-colors">
-          {p.title}
-        </h4>
-
-        <p className={`mt-3 text-sm leading-relaxed text-white/70 ${open ? "" : "line-clamp-2"}`}>
-          {open && hasFull ? p.fullDesc : p.desc}
-        </p>
-
-        {hasFull && (
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="mt-3 inline-flex items-center gap-2 text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
-          >
-            <span className="font-mono">//</span>
-            {open ? "Réduire" : "Lire plus"}
-            <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        )}
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {p.stack.slice(0, 5).map((s) => (
-            <Tag key={s}>{s}</Tag>
-          ))}
-        </div>
-
-        {p.links?.length ? (
-          <div className="mt-auto pt-4 flex items-center gap-3">
-            {p.links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="
-                  group/link inline-flex items-center gap-2 rounded-xl
-                  border border-emerald-400/30 bg-emerald-400/10 backdrop-blur-xl
-                  px-4 py-2 text-xs font-semibold text-emerald-100
-                  transition-all
-                  hover:bg-emerald-400/20 hover:border-emerald-400/50 hover:scale-105
-                  active:scale-95
-                "
-              >
-                {l.label}
-                <svg className="w-3 h-3 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-            ))}
-          </div>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
+// ============ MAIN COMPONENT ============
 export default function Projects() {
   const [filter, setFilter] = useState<"all" | ProjectType>("all");
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-  const items = useMemo(() => {
-    if (filter === "all") return ALL_PROJECTS;
-    return ALL_PROJECTS.filter((p) => p.type === filter);
+  const filteredProjects = useMemo(() => {
+    if (filter === "all") return PROJECTS;
+    return PROJECTS.filter((p) => p.type === filter);
   }, [filter]);
 
-  useEffect(() => {
-    scrollerRef.current?.scrollTo({ left: 0, behavior: "smooth" });
-  }, [filter]);
+  const featuredProjects = PROJECTS.filter((p) => p.featured);
 
-  const scrollByPage = (dir: -1 | 1) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const amount = Math.round(el.clientWidth * 0.9) * dir;
-    el.scrollTo({ left: el.scrollLeft + amount, behavior: "smooth" });
-  };
-
-  const stageCount = ALL_PROJECTS.filter(p => p.type === "stage").length;
-  const academicCount = ALL_PROJECTS.filter(p => p.type === "academic").length;
+  const stageCount = PROJECTS.filter((p) => p.type === "stage").length;
+  const academicCount = PROJECTS.filter((p) => p.type === "academic").length;
 
   return (
     <section
       id="projects"
-      className="scroll-mt-28 relative isolate px-6 pt-28 pb-32 border-t border-white/10 overflow-hidden"
+      className="scroll-mt-28 relative px-6 py-24 border-t border-white/10 overflow-hidden"
     >
       {/* Background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f14] via-[#070a0f] to-black" />
         <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay bg-[url('/noise.png')]" />
-        
-        {/* Animated grid */}
-        <div className="absolute inset-0 opacity-[0.02]" 
+
+        <div
+          className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `linear-gradient(rgba(16,185,129,0.3) 1px, transparent 1px), 
                             linear-gradient(90deg, rgba(16,185,129,0.3) 1px, transparent 1px)`,
-            backgroundSize: '40px 40px',
-            animation: 'gridMove 20s linear infinite'
+            backgroundSize: "40px 40px",
+            animation: "gridMove 20s linear infinite",
           }}
         />
-        
+
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
-        <div className="absolute left-1/2 top-10 -translate-x-1/2 h-[520px] w-[900px] rounded-full blur-3xl opacity-20 bg-[radial-gradient(circle_at_50%_40%,rgba(16,185,129,0.18),transparent_60%)] animate-pulse-slow" />
+        <div className="absolute left-1/2 top-20 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-400/10 rounded-full blur-3xl opacity-20" />
       </div>
 
       <div className="relative mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-12">
-          <BlockReveal onScroll>
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/5 backdrop-blur-xl px-4 py-2">
+        <div className="mb-16">
+          <Reveal>
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/5 backdrop-blur-xl px-4 py-2 mb-6">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-mono text-emerald-400">projects.showcase.active</span>
+              <span className="text-xs font-mono text-emerald-400">
+                projects.portfolio.active
+              </span>
             </div>
-          </BlockReveal>
+          </Reveal>
 
-          <div className="mt-6 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-            <div className="max-w-3xl">
-              <BlockReveal onScroll delay={0.06}>
-                <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-                  Projets <span className="text-emerald-400">Sélectionnés</span>
-                </h2>
-              </BlockReveal>
-              
-              <BlockReveal onScroll delay={0.12}>
-                <p className="mt-4 text-white/60 leading-relaxed">
-                  Une sélection de projets réalisés en stage et dans un cadre académique, 
-                  orientés production et architecture moderne.
-                </p>
-              </BlockReveal>
-            </div>
+          <Reveal delay={0.1}>
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">
+              <span className="text-purple-400 font-mono text-2xl">const</span>{" "}
+              projects = {"["}
+              <br />
+              <span className="ml-8 text-emerald-400">Réalisations</span>
+              <br />
+              {"];"}
+            </h2>
+          </Reveal>
 
-            <BlockReveal onScroll delay={0.18}>
-              <div className="flex flex-wrap items-center gap-3">
-                <Pill active={filter === "all"} onClick={() => setFilter("all")}>
-                  {`Tout (${ALL_PROJECTS.length})`}
-                </Pill>
-                <Pill active={filter === "stage"} onClick={() => setFilter("stage")}>
-                  {`Stages (${stageCount})`}
-                </Pill>
-                <Pill active={filter === "academic"} onClick={() => setFilter("academic")}>
-                  {`Academic (${academicCount})`}
-                </Pill>
-              </div>
-            </BlockReveal>
-          </div>
+          <Reveal delay={0.15}>
+            <p className="max-w-2xl text-white/60 leading-relaxed">
+              Projets réalisés en{" "}
+              <span className="text-blue-400">stage professionnel</span> et{" "}
+              <span className="text-purple-400">contexte académique</span>,
+              avec focus sur l'architecture et la production.
+            </p>
+          </Reveal>
         </div>
 
-        {/* Premium frame */}
-        <BlockReveal onScroll delay={0.24}>
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.03] to-black/20 backdrop-blur-xl p-6 md:p-8 shadow-2xl">
-            {/* Top bar */}
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                </div>
-                <span className="text-xs text-white/40 font-mono">~/projects</span>
-              </div>
-              
-              <div className="flex items-center gap-2 text-xs text-white/50 font-mono">
-                <span className="text-emerald-400">{items.length}</span>
-                <span>projects found</span>
-              </div>
+        {/* Featured Projects - Mise en avant */}
+        <Reveal delay={0.2}>
+          <div className="mb-16">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-amber-400 text-2xl">⭐</span>
+              <h3 className="text-2xl font-bold text-white font-mono">
+                <span className="text-emerald-400">//</span> Projets phares
+              </h3>
             </div>
 
-            {/* Carousel */}
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent z-10" />
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black to-transparent z-10" />
-
-              <div
-                ref={scrollerRef}
-                className="
-                  flex gap-5 overflow-x-auto overflow-y-hidden pb-4
-                  scroll-smooth
-                  [scrollbar-width:none]
-                  [&::-webkit-scrollbar]:hidden
-                  snap-x snap-mandatory
-                "
-              >
-                {items.map((p) => (
-                  <div
-                    key={`${p.type}-${p.title}`}
-                    className="snap-start shrink-0 w-[85%] sm:w-[60%] lg:w-[42%] xl:w-[36%] h-[480px]"
-                  >
-                    <ProjectCard p={p} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom controls */}
-            <div className="mt-8 flex flex-col items-center gap-4">
-              <div className="flex items-center gap-4">
-                <ScrollButton dir="prev" onClick={() => scrollByPage(-1)} />
-                <div className="h-px w-24 bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
-                <ScrollButton dir="next" onClick={() => scrollByPage(1)} />
-              </div>
-
-              <p className="text-xs text-white/40 font-mono">
-                <span className="text-emerald-400">//</span> Shift + scroll pour navigation horizontale
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProjects.map((project, i) => (
+                <Reveal key={project.title} delay={0.05 * i}>
+                  <ProjectCard project={project} />
+                </Reveal>
+              ))}
             </div>
           </div>
-        </BlockReveal>
+        </Reveal>
+
+        {/* All Projects Section */}
+        <Reveal delay={0.3}>
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-white font-mono">
+                <span className="text-emerald-400">//</span> Tous les projets
+              </h3>
+
+              {/* Filters */}
+              <div className="flex gap-2">
+                <FilterTab
+                  active={filter === "all"}
+                  count={PROJECTS.length}
+                  onClick={() => setFilter("all")}
+                >
+                  Tous
+                </FilterTab>
+                <FilterTab
+                  active={filter === "stage"}
+                  count={stageCount}
+                  onClick={() => setFilter("stage")}
+                >
+                  Stages
+                </FilterTab>
+                <FilterTab
+                  active={filter === "academic"}
+                  count={academicCount}
+                  onClick={() => setFilter("academic")}
+                >
+                  Academic
+                </FilterTab>
+              </div>
+            </div>
+
+            {/* Terminal-style container */}
+            <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl overflow-hidden">
+              {/* Terminal header */}
+              <div className="flex items-center justify-between px-6 py-4 bg-black/60 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <span className="text-xs text-white/40 font-mono">
+                    ~/projects/{filter}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-mono">
+                  <span className="text-emerald-400">
+                    {filteredProjects.length}
+                  </span>
+                  <span className="text-white/50">found</span>
+                </div>
+              </div>
+
+              {/* Projects grid */}
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProjects.map((project, i) => (
+                    <Reveal key={project.title} delay={0.05 * i}>
+                      <ProjectCard project={project} />
+                    </Reveal>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Stats Summary */}
+        <Reveal delay={0.4}>
+          <div className="mt-16 rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-emerald-400/10 to-black/20 backdrop-blur-xl p-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div>
+                <div className="text-4xl font-bold text-emerald-400 mb-2">
+                  {PROJECTS.length}
+                </div>
+                <div className="text-sm text-white/60 font-mono">
+                  Total Projects
+                </div>
+              </div>
+              <div>
+                <div className="text-4xl font-bold text-blue-400 mb-2">
+                  {stageCount}
+                </div>
+                <div className="text-sm text-white/60 font-mono">
+                  Stages Pro
+                </div>
+              </div>
+              <div>
+                <div className="text-4xl font-bold text-purple-400 mb-2">
+                  {academicCount}
+                </div>
+                <div className="text-sm text-white/60 font-mono">
+                  Academic
+                </div>
+              </div>
+              <div>
+                <div className="text-4xl font-bold text-amber-400 mb-2">
+                  {featuredProjects.length}
+                </div>
+                <div className="text-sm text-white/60 font-mono">Featured</div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <div className="rounded-lg border border-emerald-400/30 bg-black/60 backdrop-blur px-4 py-2 font-mono text-xs text-emerald-400">
+                <span className="text-purple-400">console</span>.log(
+                <span className="text-amber-400">"Ready for production"</span>
+                );
+              </div>
+            </div>
+          </div>
+        </Reveal>
       </div>
 
-     
     </section>
   );
 }

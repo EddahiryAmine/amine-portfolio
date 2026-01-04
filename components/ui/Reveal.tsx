@@ -1,25 +1,67 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-type Props = {
+gsap.registerPlugin(ScrollTrigger);
+
+type RevealProps = {
   children: React.ReactNode;
+  className?: string;
+  y?: number;
   delay?: number;
+  duration?: number;
 };
 
-export default function Reveal({ children, delay = 0 }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+export default function Reveal({
+  children,
+  className = "",
+  y = 50,
+  delay = 0,
+  duration = 0.8,
+}: RevealProps) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    // Configuration initiale
+    gsap.set(el, { 
+      opacity: 0, 
+      y, 
+      filter: "blur(8px)",
+      willChange: "transform, opacity, filter"
+    });
+
+    // Animation
+    const ctx = gsap.context(() => {
+      gsap.to(el, {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration,
+        delay,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 90%",
+          end: "top 70%",
+          toggleActions: "play none none reverse",
+          // markers: true, // Décommentez pour debug
+        },
+      });
+    });
+
+    return () => {
+      ctx.revert(); // Nettoie tout automatiquement
+    };
+  }, [y, delay, duration]);
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay }}
-    >
+    <div ref={ref} className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
