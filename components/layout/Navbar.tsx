@@ -159,17 +159,18 @@ useEffect(() => {
               }
             `}
           >
-            {/* Background effects avancés */}
-            <div className="pointer-events-none absolute inset-0">
-              {/* Gradient orb animé */}
-              <div 
-                className="absolute -top-32 h-64 w-full rounded-full blur-3xl opacity-20 transition-opacity duration-700"
-                style={{
-                  background: 'radial-gradient(circle, rgba(16,185,129,0.4) 0%, transparent 70%)',
-                  left: `${(mousePos.x / window.innerWidth) * 20 - 10}%`,
-                  opacity: scrolled ? 0.3 : 0.2
-                }}
-              />
+{/* Background effects avancés */}
+<div className="pointer-events-none absolute inset-0">
+  {/* Gradient orb animé */}
+  <div
+    className="absolute inset-0"
+    style={{
+      background: "radial-gradient(circle, rgba(16,185,129,0.4) 0%, transparent 70%)",
+      left: `${(mousePos.x / Math.max(vw, 1)) * 20 - 10}%`,
+      opacity: scrolled ? 0.3 : 0.2,
+    }}
+  />
+
               
               {/* Grille animée */}
               <div 
