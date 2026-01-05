@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -40,7 +40,7 @@ function Reveal({
           toggleActions: "play none none reverse",
         },
       });
-    });
+    }, el);
 
     return () => ctx.revert();
   }, [y, delay]);
@@ -52,12 +52,45 @@ function Reveal({
   );
 }
 
+function MetaPill({
+  icon,
+  label,
+}: {
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-white/10">
+      <span className="text-lg">{icon}</span>
+      <span className="text-xs text-white/70 font-mono">{label}</span>
+    </div>
+  );
+}
+
+function MiniBadge({
+  value,
+  label,
+  valueClass = "text-white",
+}: {
+  value: string;
+  label: string;
+  valueClass?: string;
+}) {
+  return (
+    <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl">
+      <span className={`text-sm font-bold ${valueClass}`}>{value}</span>
+      <span className="mx-2 text-white/30">•</span>
+      <span className="text-xs text-white/50 font-mono">{label}</span>
+    </div>
+  );
+}
+
 export default function Resume() {
   const [downloading, setDownloading] = useState(false);
 
-  const handleDownload = () => {
+  const onDownload = () => {
     setDownloading(true);
-    setTimeout(() => setDownloading(false), 2000);
+    window.setTimeout(() => setDownloading(false), 1600);
   };
 
   return (
@@ -70,18 +103,19 @@ export default function Resume() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f14] via-[#070a0f] to-black" />
         <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay bg-[url('/noise.png')]" />
 
+        {/* Grid (un peu plus léger pour éviter surcharge) */}
         <div
-          className="absolute inset-0 opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.012]"
           style={{
-            backgroundImage: `linear-gradient(rgba(16,185,129,0.3) 1px, transparent 1px), 
-                            linear-gradient(90deg, rgba(16,185,129,0.3) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(rgba(16,185,129,0.3) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(16,185,129,0.3) 1px, transparent 1px)`,
             backgroundSize: "40px 40px",
             animation: "gridMove 20s linear infinite",
           }}
         />
 
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
-        <div className="absolute left-1/2 top-20 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-400/10 rounded-full blur-3xl opacity-20" />
+        <div className="absolute left-1/2 top-20 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-400/10 rounded-full blur-3xl opacity-15" />
       </div>
 
       <div className="relative mx-auto max-w-7xl">
@@ -99,10 +133,11 @@ export default function Resume() {
           <Reveal delay={0.1}>
             <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">
               <span className="text-purple-400 font-mono text-2xl">const</span>{" "}
-              CV = {"{"}<br />
+              CV = {"{"}
+              <br />
               <span className="text-emerald-400">Téléchargeable</span>
               <br />
-              {"}"};
+              {"}"};{" "}
             </h2>
           </Reveal>
 
@@ -114,7 +149,7 @@ export default function Resume() {
           </Reveal>
         </div>
 
-        {/* Main Content */}
+        {/* Main Grid */}
         <div className="grid gap-8 lg:grid-cols-2 items-start">
           {/* Left - Download Card */}
           <Reveal delay={0.2}>
@@ -148,9 +183,9 @@ export default function Resume() {
 
                 {/* Download Button */}
                 <a
-                  href="/Amine_Eddahiry.pdf"
+                  href="/Amine_Eddahiry.pdf?v=2026"
                   download
-                  onClick={handleDownload}
+                  onClick={onDownload}
                   className="
                     group relative w-full inline-flex items-center justify-center gap-3
                     rounded-2xl px-8 py-5 mb-4
@@ -200,7 +235,7 @@ export default function Resume() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2.5}
-                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 01.707-.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                         />
                       </svg>
                       <span className="relative">Télécharger le PDF</span>
@@ -210,7 +245,7 @@ export default function Resume() {
 
                 {/* View Button */}
                 <a
-                  href="/Amine_Eddahiry.pdf"
+                  href="/Amine_Eddahiry.pdf?v=2026"
                   target="_blank"
                   rel="noreferrer"
                   className="
@@ -258,44 +293,31 @@ export default function Resume() {
                   </svg>
                 </a>
 
-                {/* Features */}
+                {/* Features (gardées) */}
                 <div className="mt-6 grid grid-cols-3 gap-2">
-                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-white/10">
-                    <span className="text-lg">⚡</span>
-                    <span className="text-xs text-white/70 font-mono">
-                      Rapide
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-white/10">
-                    <span className="text-lg">✨</span>
-                    <span className="text-xs text-white/70 font-mono">
-                      Propre
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-white/10">
-                    <span className="text-lg">🎯</span>
-                    <span className="text-xs text-white/70 font-mono">ATS</span>
-                  </div>
+                  <MetaPill icon="⚡" label="Rapide" />
+                  <MetaPill icon="✨" label="Propre" />
+                  <MetaPill icon="🎯" label="ATS" />
                 </div>
               </div>
             </div>
           </Reveal>
 
-          {/* Right - Preview */}
+          {/* Right - Real CV Preview (PDF) */}
           <Reveal delay={0.25}>
             <div className="relative">
-              {/* Glow effect */}
+              {/* Glow effect (gardé) */}
               <div className="absolute -inset-4 bg-gradient-to-br from-emerald-400/20 via-transparent to-purple-400/20 rounded-3xl blur-2xl opacity-60 animate-pulse-slow" />
 
-              {/* Preview Card */}
               <div className="relative rounded-3xl border-2 border-white/20 bg-gradient-to-br from-black/60 to-black/80 backdrop-blur-xl overflow-hidden shadow-2xl">
-                {/* Window Chrome */}
+                {/* Window Chrome (gardé) */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500/80" />
                     <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
                     <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
                   </div>
+
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-white/50 font-mono">
                       Amine_Eddahiry.pdf
@@ -303,81 +325,60 @@ export default function Resume() {
                     <div className="flex items-center gap-1 px-2 py-1 rounded-lg border border-emerald-400/30 bg-emerald-400/10">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       <span className="text-xs text-emerald-400 font-mono">
-                        Ready
+                        Preview
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Document Preview */}
-                <div className="p-8 space-y-6">
-                  {/* Header Section */}
-                  <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.02] p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400/30 to-purple-400/30 border-2 border-white/20" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-4 w-48 rounded-lg bg-white/20" />
-                        <div className="h-3 w-36 rounded-lg bg-white/10" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-2 w-full rounded bg-white/15" />
-                      <div className="h-2 w-[95%] rounded bg-white/15" />
-                      <div className="h-2 w-[88%] rounded bg-white/15" />
-                    </div>
+                {/* Preview container */}
+                <div className="relative">
+                  {/* Desktop preview */}
+                  <div className="hidden lg:block">
+                    <iframe
+                      src="/Amine_Eddahiry.pdf?v=2026#view=FitH"
+                      title="CV PDF Preview"
+                      className="w-full h-[680px]"
+                    />
                   </div>
 
-                  {/* Skills Grid */}
-                  <div className="grid grid-cols-2 gap-3">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className="rounded-xl bg-white/[0.06] border border-white/10 p-4 h-20"
-                      />
-                    ))}
-                  </div>
+                  {/* Mobile fallback */}
+                  <div className="lg:hidden p-8">
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 text-center">
+                      <p className="text-sm text-white/60 leading-relaxed">
+                        Aperçu PDF désactivé sur mobile pour de meilleures
+                        performances.
+                      </p>
 
-                  {/* Experience Blocks */}
-                  <div className="space-y-3">
-                    {[1, 2].map((i) => (
-                      <div
-                        key={i}
-                        className="rounded-xl border border-white/10 bg-white/[0.04] p-4"
+                      <a
+                        href="/Amine_Eddahiry.pdf?v=2026"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="
+                          mt-4 group relative w-full inline-flex items-center justify-center gap-3
+                          rounded-2xl px-8 py-5
+                          border-2 border-white/20 bg-white/[0.05]
+                          text-white font-semibold text-base backdrop-blur-xl
+                          transition-all
+                          hover:bg-white/[0.1] hover:border-emerald-400/40 hover:scale-[1.02]
+                          active:scale-95
+                        "
                       >
-                        <div className="h-3 w-40 rounded bg-white/20 mb-2" />
-                        <div className="space-y-1.5">
-                          <div className="h-2 w-full rounded bg-white/10" />
-                          <div className="h-2 w-[92%] rounded bg-white/10" />
-                          <div className="h-2 w-[85%] rounded bg-white/10" />
-                        </div>
-                      </div>
-                    ))}
+                        Ouvrir le CV
+                        <span className="text-white/60">↗</span>
+                      </a>
+                    </div>
                   </div>
 
-                  {/* Footer */}
-                  <div className="flex items-center gap-2 text-xs text-white/40 font-mono pt-4 border-t border-white/10">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    Aperçu simplifié du document complet
-                  </div>
+                  {/* Bottom fade pour “finir” clean */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/70 to-transparent" />
                 </div>
               </div>
             </div>
           </Reveal>
         </div>
 
-        {/* Info Banner */}
+        {/* Info Banner (gardé) */}
         <Reveal delay={0.3}>
           <div className="mt-12 rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-emerald-400/10 to-black/20 backdrop-blur-xl p-6 overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/5 via-transparent to-purple-400/5" />
@@ -392,8 +393,8 @@ export default function Resume() {
                   Optimisé pour les systèmes ATS
                 </h3>
                 <p className="text-sm text-white/60">
-                  Format structuré pour les logiciels de tracking automatique
-                  et lecture rapide par les recruteurs. Mots-clés pertinents et
+                  Format structuré pour les logiciels de tracking automatique et
+                  lecture rapide par les recruteurs. Mots-clés pertinents et
                   sections clairement définies.
                 </p>
               </div>
@@ -420,36 +421,16 @@ export default function Resume() {
           </div>
         </Reveal>
 
-        {/* Stats */}
+        {/* Bottom meta badges (remplace les 4 grosses stats cards) */}
         <Reveal delay={0.35}>
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl">
-              <div className="text-3xl font-bold text-emerald-400 mb-2">
-                PDF
-              </div>
-              <div className="text-xs text-white/50 font-mono">Format</div>
-            </div>
-            <div className="text-center p-4 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl">
-              <div className="text-3xl font-bold text-blue-400 mb-2">FR</div>
-              <div className="text-xs text-white/50 font-mono">Langue</div>
-            </div>
-            <div className="text-center p-4 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl">
-              <div className="text-3xl font-bold text-purple-400 mb-2">
-                2026
-              </div>
-              <div className="text-xs text-white/50 font-mono">
-                Mise à jour
-              </div>
-            </div>
-            <div className="text-center p-4 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl">
-              <div className="text-3xl font-bold text-amber-400 mb-2">ATS</div>
-              <div className="text-xs text-white/50 font-mono">Optimisé</div>
-            </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+            <MiniBadge value="PDF" label="Format" valueClass="text-emerald-400" />
+            <MiniBadge value="FR" label="Langue" valueClass="text-blue-400" />
+            <MiniBadge value="2026" label="Mise à jour" valueClass="text-purple-400" />
+            <MiniBadge value="ATS" label="Optimisé" valueClass="text-amber-400" />
           </div>
         </Reveal>
       </div>
-
-   
     </section>
   );
 }

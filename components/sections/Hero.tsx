@@ -1,8 +1,26 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faArrowUpRightFromSquare,
+  faBolt,
+  faBrain,
+  faCodeBranch,
+  faDatabase,
+  faGraduationCap,
+  faLayerGroup,
+  faTerminal,
+  faCircle,
+  faRocket,
+  faEnvelope,
+  faBriefcase,
+} from "@fortawesome/free-solid-svg-icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,17 +46,25 @@ function PageLoader() {
         duration: 0.8,
         ease: "power3.out",
       })
-        .to(".loader-progress", {
-          scaleX: 1,
-          duration: 1.2,
-          ease: "power2.inOut",
-        }, "-=0.4")
-        .to(".loader-text", {
-          y: -100,
-          opacity: 0,
-          duration: 0.6,
-          ease: "power3.in",
-        }, "-=0.3")
+        .to(
+          ".loader-progress",
+          {
+            scaleX: 1,
+            duration: 1.2,
+            ease: "power2.inOut",
+          },
+          "-=0.4"
+        )
+        .to(
+          ".loader-text",
+          {
+            y: -100,
+            opacity: 0,
+            duration: 0.6,
+            ease: "power3.in",
+          },
+          "-=0.3"
+        )
         .to(
           ".loader-bar",
           {
@@ -83,7 +109,7 @@ function PageLoader() {
         </div>
 
         <div className="w-64 h-1 bg-white/10 mx-auto rounded-full overflow-hidden">
-          <div 
+          <div
             className="loader-progress h-full bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-400 rounded-full origin-left"
             style={{ transform: "scaleX(0)" }}
           />
@@ -94,7 +120,7 @@ function PageLoader() {
         </div>
       </div>
 
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
           backgroundImage: `linear-gradient(rgba(16,185,129,0.5) 1px, transparent 1px),
@@ -106,7 +132,7 @@ function PageLoader() {
   );
 }
 
-// ============ REVEAL COMPONENT ============
+// ============ REVEAL ============
 type RevealProps = {
   children: React.ReactNode;
   className?: string;
@@ -128,11 +154,11 @@ function Reveal({
     const el = ref.current;
     if (!el) return;
 
-    gsap.set(el, { 
-      opacity: 0, 
-      y, 
+    gsap.set(el, {
+      opacity: 0,
+      y,
       filter: "blur(8px)",
-      willChange: "transform, opacity, filter"
+      willChange: "transform, opacity, filter",
     });
 
     const ctx = gsap.context(() => {
@@ -150,7 +176,7 @@ function Reveal({
           toggleActions: "play none none reverse",
         },
       });
-    });
+    }, el);
 
     return () => ctx.revert();
   }, [y, delay, duration]);
@@ -185,7 +211,9 @@ function Typewriter({ text, speed = 42 }: { text: string; speed?: number }) {
   return (
     <span className="relative">
       {out}
-      <span className="inline-block w-[10px] ml-1 text-emerald-400 animate-pulse">|</span>
+      <span className="inline-block w-[10px] ml-1 text-emerald-400 animate-pulse">
+        |
+      </span>
     </span>
   );
 }
@@ -203,24 +231,42 @@ function CodeSnippet({ code, delay = 0 }: { code: string; delay?: number }) {
           <div className="w-2 h-2 rounded-full bg-yellow-500" />
           <div className="w-2 h-2 rounded-full bg-green-500" />
         </div>
-        <span className="text-white/40 text-[10px]">terminal</span>
+        <span className="text-white/40 text-[10px] inline-flex items-center gap-2">
+          <FontAwesomeIcon icon={faTerminal} />
+          terminal
+        </span>
       </div>
       <div className="text-emerald-400">{code}</div>
     </div>
   );
 }
 
-// ============ PILL ============
-function Pill({ children }: { children: string }) {
+// ============ PILL (avec icône FA) ============
+function Pill({
+  icon,
+  children,
+}: {
+  icon: IconDefinition;
+  children: string;
+}) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/70 backdrop-blur hover:border-emerald-400/30 hover:bg-emerald-400/5 transition-all">
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/70 backdrop-blur hover:border-emerald-400/30 hover:bg-emerald-400/5 transition-all">
+      <FontAwesomeIcon icon={icon} className="text-emerald-400/90" />
       {children}
     </span>
   );
 }
 
-// ============ CTA BUTTONS ============
-function PrimaryCTA({ href, children }: { href: string; children: string }) {
+// ============ CTA BUTTONS (FA) ============
+function PrimaryCTA({
+  href,
+  children,
+  icon = faEnvelope,
+}: {
+  href: string;
+  children: string;
+  icon?: IconDefinition;
+}) {
   return (
     <a
       href={href}
@@ -234,13 +280,25 @@ function PrimaryCTA({ href, children }: { href: string; children: string }) {
         active:scale-[0.99]
       "
     >
+      <FontAwesomeIcon icon={icon} />
       {children}
-      <span className="opacity-80 transition-transform group-hover:translate-x-0.5">↗</span>
+      <FontAwesomeIcon
+        icon={faArrowUpRightFromSquare}
+        className="opacity-80 transition-transform group-hover:translate-x-0.5"
+      />
     </a>
   );
 }
 
-function SecondaryCTA({ href, children }: { href: string; children: string }) {
+function SecondaryCTA({
+  href,
+  children,
+  icon = faArrowRight,
+}: {
+  href: string;
+  children: string;
+  icon?: IconDefinition;
+}) {
   return (
     <a
       href={href}
@@ -255,19 +313,22 @@ function SecondaryCTA({ href, children }: { href: string; children: string }) {
       "
     >
       {children}
-      <span className="opacity-70 transition-transform group-hover:translate-x-0.5">→</span>
+      <FontAwesomeIcon
+        icon={icon}
+        className="opacity-70 transition-transform group-hover:translate-x-0.5"
+      />
     </a>
   );
 }
 
-// ============ ENHANCED STAT ============
+// ============ ENHANCED STAT (FA) ============
 function EnhancedStat({
   icon,
   value,
   label,
   gradient,
 }: {
-  icon: string;
+  icon: IconDefinition;
   value: string;
   label: string;
   gradient: string;
@@ -279,15 +340,34 @@ function EnhancedStat({
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 via-transparent to-purple-400/10 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="relative rounded-2xl bg-black/80 backdrop-blur px-5 py-4 h-full">
         <div className="flex items-start justify-between mb-2">
-          <div className="text-3xl">{icon}</div>
+          <div className="w-10 h-10 rounded-xl border border-white/10 bg-white/[0.03] flex items-center justify-center">
+            <FontAwesomeIcon icon={icon} className="text-emerald-300" />
+          </div>
+
           <div className="flex items-center gap-1">
-            <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-            <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" style={{ animationDelay: "0.2s" }} />
-            <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" style={{ animationDelay: "0.4s" }} />
+            <span className="text-emerald-400 animate-pulse">
+              <FontAwesomeIcon icon={faCircle} className="text-[6px]" />
+            </span>
+            <span
+              className="text-emerald-400 animate-pulse"
+              style={{ animationDelay: "0.2s" }}
+            >
+              <FontAwesomeIcon icon={faCircle} className="text-[6px]" />
+            </span>
+            <span
+              className="text-emerald-400 animate-pulse"
+              style={{ animationDelay: "0.4s" }}
+            >
+              <FontAwesomeIcon icon={faCircle} className="text-[6px]" />
+            </span>
           </div>
         </div>
+
         <div className="text-2xl font-bold text-white mb-1">{value}</div>
-        <div className="text-xs uppercase tracking-wider text-white/50 font-mono">{label}</div>
+        <div className="text-xs uppercase tracking-wider text-white/50 font-mono">
+          {label}
+        </div>
+
         <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </div>
@@ -302,7 +382,7 @@ export default function Hero() {
   return (
     <>
       <PageLoader />
-      
+
       <section id="home" className="min-h-screen overflow-hidden relative">
         {/* Background */}
         <div className="pointer-events-none absolute inset-0">
@@ -324,8 +404,7 @@ export default function Hero() {
 
         <div className="relative mx-auto max-w-7xl px-6 pt-24 pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[85vh]">
-            
-            {/* LEFT - CONTENT */}
+            {/* LEFT */}
             <div className="order-2 lg:order-1">
               <Reveal>
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/65 backdrop-blur">
@@ -336,39 +415,51 @@ export default function Hero() {
 
               <Reveal delay={0.08} y={26}>
                 <h1 className="mt-6 text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.05]">
-                  <span className="font-mono tracking-tight text-white/60 text-2xl md:text-3xl">{"<"}dev{">"}</span>
+                  <span className="font-mono tracking-tight text-white/60 text-2xl md:text-3xl">
+                    {"<"}dev{">"}
+                  </span>
                   <br />
-                  <span className="font-mono tracking-tight text-white">Bonjour, je suis</span>
+                  <span className="font-mono tracking-tight text-white">
+                    Bonjour,je suis
+                  </span>
                   <br />
                   <span className="font-mono tracking-tight text-emerald-400">
                     <Typewriter text="Amine Eddahiry" />
                   </span>
                   <br />
-                  <span className="font-mono tracking-tight text-white/60 text-xl md:text-2xl">{"</"}dev{">"}</span>
+                  <span className="font-mono tracking-tight text-white/60 text-xl md:text-2xl">
+                    {"</"}dev{">"}
+                  </span>
                 </h1>
               </Reveal>
 
               <Reveal delay={0.12} y={18}>
                 <p className="mt-6 max-w-xl text-lg text-white/70 leading-relaxed">
-                  Je construis des produits solides : APIs robustes, microservices, sécurité, intégrations et IA appliquée — avec un focus qualité, performance et maintenance.
+                  Je construis des produits solides : APIs robustes, microservices,
+                  sécurité, intégrations et IA appliquée — avec un focus qualité,
+                  performance et maintenance.
                 </p>
               </Reveal>
 
               <Reveal delay={0.16} y={18}>
                 <div className="mt-6 flex flex-wrap gap-2">
-                  <Pill>Spring Boot</Pill>
-                  <Pill>.NET</Pill>
-                  <Pill>FastAPI</Pill>
-                  <Pill>Microservices</Pill>
-                  <Pill>Docker</Pill>
-                  <Pill>PostgreSQL</Pill>
+                  <Pill icon={faBolt}>Spring Boot</Pill>
+                  <Pill icon={faLayerGroup}>.NET</Pill>
+                  <Pill icon={faRocket}>FastAPI</Pill>
+                  <Pill icon={faCodeBranch}>Microservices</Pill>
+                  <Pill icon={faTerminal}>Docker</Pill>
+                  <Pill icon={faDatabase}>PostgreSQL</Pill>
                 </div>
               </Reveal>
 
               <Reveal delay={0.2} y={18}>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <PrimaryCTA href="#contact">Me contacter</PrimaryCTA>
-                  <SecondaryCTA href="#projects">Voir mes projets</SecondaryCTA>
+                  <PrimaryCTA href="#contact" icon={faEnvelope}>
+                    Me contacter
+                  </PrimaryCTA>
+                  <SecondaryCTA href="#projects" icon={faArrowRight}>
+                    Voir mes projets
+                  </SecondaryCTA>
                 </div>
               </Reveal>
 
@@ -382,12 +473,11 @@ export default function Hero() {
               </Reveal>
             </div>
 
-            {/* RIGHT - IMAGE DEVELOPPEUR STYLE */}
+            {/* RIGHT */}
             <div className="order-1 lg:order-2 relative">
               <Reveal y={30} duration={0.9}>
                 <div className="relative aspect-square max-w-[600px] mx-auto">
-                  
-                  {/* Snippets de code flottants */}
+                  {/* Floating snippets */}
                   {mounted && (
                     <>
                       <div className="absolute -top-8 left-8 z-20 hidden md:block">
@@ -402,35 +492,32 @@ export default function Hero() {
                     </>
                   )}
 
-                  {/* Container principal avec effet glitch */}
                   <div className="relative w-full h-full">
-                    
-                    {/* Bordures néon animées */}
                     <div className="absolute -inset-4 rounded-3xl border-2 border-emerald-400/30 animate-pulse-slow" />
-                    <div className="absolute -inset-2 rounded-3xl border border-emerald-400/20" 
-                         style={{ animation: "spin 40s linear infinite" }} />
-                    
-                    {/* Photo principale avec overlay code */}
+                    <div
+                      className="absolute -inset-2 rounded-3xl border border-emerald-400/20"
+                      style={{ animation: "spin 40s linear infinite" }}
+                    />
+
                     <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white/10 bg-gradient-to-br from-emerald-900/20 to-purple-900/20">
-                      
-                      {/* Image */}
-                      <img 
-                        src="/me.png" 
-                        alt="Amine Eddahiry" 
+                      <img
+                        src="/me.png"
+                        alt="Amine Eddahiry"
                         className="w-full h-full object-cover object-center"
                       />
-                      
-                      {/* Overlay gradient */}
+
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      
-                      {/* Effet scanline */}
-                      <div className="absolute inset-0 opacity-10"
-                           style={{
-                             backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(16, 185, 129, 0.1) 2px, rgba(16, 185, 129, 0.1) 4px)",
-                             animation: "scanline 8s linear infinite"
-                           }} />
-                      
-                      {/* Code overlay en bas */}
+
+                      <div
+                        className="absolute inset-0 opacity-10"
+                        style={{
+                          backgroundImage:
+                            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(16, 185, 129, 0.1) 2px, rgba(16, 185, 129, 0.1) 4px)",
+                          animation: "scanline 8s linear infinite",
+                        }}
+                      />
+
+                      {/* Code overlay */}
                       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/95 to-transparent">
                         <div className="font-mono text-xs space-y-1">
                           <div className="flex items-center gap-2">
@@ -439,53 +526,93 @@ export default function Hero() {
                             <span className="text-white/60">{"{"}</span>
                           </div>
                           <div className="ml-4 text-white/60">
-                            <span className="text-blue-400">location</span>: 
-                            <span className="text-amber-400"> "Casablanca"</span>;
+                            <span className="text-blue-400">location</span>:{" "}
+                            <span className="text-amber-400">"Casablanca"</span>;
                           </div>
                           <div className="ml-4 text-white/60">
-                            <span className="text-blue-400">status</span>: 
-                            <span className="text-green-400"> "available"</span>;
+                            <span className="text-blue-400">status</span>:{" "}
+                            <span className="text-green-400">"available"</span>;
                           </div>
                           <div className="ml-4 text-white/60">
                             <span className="text-blue-400">skills</span>: [
-                            <span className="text-amber-400">"Backend"</span>, 
+                            <span className="text-amber-400">"Backend"</span>,{" "}
                             <span className="text-amber-400">"AI"</span>];
                           </div>
                           <div className="text-white/60">{"}"}</div>
                         </div>
                       </div>
-                      
-                      {/* Points lumineux animés */}
+
+                      {/* dots */}
                       <div className="absolute top-4 right-4 flex gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" style={{ animationDelay: "0.3s" }} />
-                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" style={{ animationDelay: "0.6s" }} />
+                        <div
+                          className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
+                          style={{ animationDelay: "0.3s" }}
+                        />
+                        <div
+                          className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
+                          style={{ animationDelay: "0.6s" }}
+                        />
                       </div>
                     </div>
 
-                    {/* Glitch effect layers */}
+                    {/* glitch */}
                     <div className="absolute inset-0 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                      <div className="absolute inset-0 bg-emerald-400/5 mix-blend-screen animate-glitch" style={{ animationDelay: "0s" }} />
-                      <div className="absolute inset-0 bg-purple-400/5 mix-blend-screen animate-glitch" style={{ animationDelay: "0.1s" }} />
+                      <div
+                        className="absolute inset-0 bg-emerald-400/5 mix-blend-screen animate-glitch"
+                        style={{ animationDelay: "0s" }}
+                      />
+                      <div
+                        className="absolute inset-0 bg-purple-400/5 mix-blend-screen animate-glitch"
+                        style={{ animationDelay: "0.1s" }}
+                      />
                     </div>
                   </div>
                 </div>
               </Reveal>
             </div>
-
           </div>
 
-          {/* STATS */}
+          {/* STATS (Font Awesome) */}
           <div className="mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-            <Reveal delay={0.05}><EnhancedStat icon="🎓" value="3+" label="Stages Pro" gradient="from-emerald-400/20 via-emerald-400/10 to-transparent" /></Reveal>
-            <Reveal delay={0.1}><EnhancedStat icon="🚀" value="8+" label="Projets Déployés" gradient="from-blue-400/20 via-blue-400/10 to-transparent" /></Reveal>
-            <Reveal delay={0.15}><EnhancedStat icon="⚡" value="Microservices" label="Architecture" gradient="from-purple-400/20 via-purple-400/10 to-transparent" /></Reveal>
-            <Reveal delay={0.2}><EnhancedStat icon="🤖" value="IA appliquée" label="ML & LLMs" gradient="from-amber-400/20 via-amber-400/10 to-transparent" /></Reveal>
+            <Reveal delay={0.05}>
+              <EnhancedStat
+                icon={faBriefcase}
+                value="3+"
+                label="Stages Pro"
+                gradient="from-emerald-400/20 via-emerald-400/10 to-transparent"
+              />
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <EnhancedStat
+                icon={faRocket}
+                value="8+"
+                label="Projets Déployés"
+                gradient="from-blue-400/20 via-blue-400/10 to-transparent"
+              />
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <EnhancedStat
+                icon={faCodeBranch}
+                value="Microservices"
+                label="Architecture"
+                gradient="from-purple-400/20 via-purple-400/10 to-transparent"
+              />
+            </Reveal>
+
+            <Reveal delay={0.2}>
+              <EnhancedStat
+                icon={faBrain}
+                value="IA appliquée"
+                label="ML & LLMs"
+                gradient="from-amber-400/20 via-amber-400/10 to-transparent"
+              />
+            </Reveal>
           </div>
         </div>
       </section>
-
-  
     </>
   );
 }

@@ -1,10 +1,42 @@
 @import "tailwindcss";
 
 html, body {
-  background: radial-gradient(1200px circle at 20% 10%, rgba(99,102,241,0.14), transparent 55%),
-              radial-gradient(900px circle at 80% 20%, rgba(34,211,238,0.10), transparent 55%),
-              #020617;
+  min-height: 100%;
 }
+
+body {
+  background: linear-gradient(to bottom, #0b0f14, #070a0f, #000);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 20% 10%, rgba(16,185,129,0.14), transparent 65%),
+    radial-gradient(800px 480px at 80% 20%, rgba(16,185,129,0.10), transparent 65%);
+  opacity: 1;
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("/noise.png");
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  z-index: 0;
+}
+
+/* ton app au-dessus du background */
+#__next, main {
+  position: relative;
+  z-index: 1;
+}
+
 @keyframes ringSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -366,3 +398,50 @@ html, body {
         .animate-pulse-slow {
           animation: pulse-slow 4s ease-in-out infinite;
         }
+                @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes shine {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes grid-move {
+          0% { background-position: 0 0; }
+          100% { background-position: 24px 24px; }
+        }
+                @keyframes gridMove {
+          0% { transform: translate(0, 0); }
+          100% { transform: translate(48px, 48px); }
+        }
+        
+        @keyframes scanlines {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(4px); }
+        }
+        
+        @keyframes shine {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+            @keyframes matrixScroll {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(50px); }
+        }
+        @keyframes rotate {
+          from { transform: rotate(0deg) scale(var(--scale)); }
+          to { transform: rotate(360deg) scale(var(--scale)); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) translateY(0px); }
+          50% { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) translateY(-10px); }
+        }
+        @keyframes scanline {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateX(-10px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        

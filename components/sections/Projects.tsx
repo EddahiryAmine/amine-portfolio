@@ -6,7 +6,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ============ REVEAL COMPONENT ============
 function Reveal({
   children,
   className = "",
@@ -52,7 +51,6 @@ function Reveal({
   );
 }
 
-// ============ DATA ============
 type ProjectType = "stage" | "academic";
 
 type Project = {
@@ -145,7 +143,6 @@ const PROJECTS: Project[] = [
   },
 ];
 
-// ============ COMPONENTS ============
 function FilterTab({
   active,
   children,
@@ -348,7 +345,7 @@ export default function Projects() {
         <Reveal delay={0.2}>
           <div className="mb-16">
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-amber-400 text-2xl">⭐</span>
+              <span className="text-amber-400 text-2xl"></span>
               <h3 className="text-2xl font-bold text-white font-mono">
                 <span className="text-emerald-400">//</span> Projets phares
               </h3>
